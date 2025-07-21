@@ -3,7 +3,9 @@ package com.kane.customer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
+@EnableAspectJAutoProxy
 @SpringBootApplication
 @ComponentScan(basePackages = {"com.kane.customer", "com.kane.common"})
 public class CustomerApplication {
