@@ -1,7 +1,6 @@
 package com.kane.customer.controller;
 
 import com.kane.common.exception.NoFoundException;
-import com.kane.common.response.SuccessResponse;
 import com.kane.customer.dto.request.CreateCustomerRequest;
 import com.kane.customer.dto.response.CustomerResponse;
 import com.kane.customer.mapper.CustomerMapper;
@@ -20,18 +19,17 @@ public class CustomerController {
   private final CustomerService customerService;
 
   @PostMapping("/create-customer")
-  public ResponseEntity<SuccessResponse<CustomerResponse>> createCustomer(
+  public ResponseEntity<CustomerResponse> createCustomer(
       @RequestBody CreateCustomerRequest createCustomerRequest) {
     log.info("Create Customer Request: {}", createCustomerRequest);
 
     Customer customer = customerService.createCustomer(createCustomerRequest);
     CustomerResponse customerResponse = CustomerMapper.INSTANCE.toCustomerDTO(customer);
-    return ResponseEntity.ok(SuccessResponse.of(customerResponse));
+    return ResponseEntity.ok(customerResponse);
   }
 
   @GetMapping("/email/{email}")
-  public ResponseEntity<SuccessResponse<CustomerResponse>> getCustomerByEmail(
-      @PathVariable String email) {
+  public ResponseEntity<CustomerResponse> getCustomerByEmail(@PathVariable String email) {
     Customer customer =
         customerService
             .findByEmail(email)
@@ -39,6 +37,6 @@ public class CustomerController {
     CustomerResponse customerResponse = CustomerMapper.INSTANCE.toCustomerDTO(customer);
 
     log.info("Get Customer By Email: {}", customerResponse.getAddress());
-    return ResponseEntity.ok(SuccessResponse.of(CustomerMapper.INSTANCE.toCustomerDTO(customer)));
+    return ResponseEntity.ok(CustomerMapper.INSTANCE.toCustomerDTO(customer));
   }
 }
