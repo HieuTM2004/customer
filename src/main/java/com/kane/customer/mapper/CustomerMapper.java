@@ -7,12 +7,9 @@ import com.kane.customer.model.Address;
 import com.kane.customer.model.Customer;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface CustomerMapper {
-  CustomerMapper INSTANCE = Mappers.getMapper(CustomerMapper.class);
-
   @Mapping(source = "address", target = "address")
   Customer toCustomer(final CreateCustomerRequest createCustomerRequest);
 

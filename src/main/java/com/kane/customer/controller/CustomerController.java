@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(path = "/customer")
 public class CustomerController {
   private final CustomerService customerService;
+  private final CustomerMapper customerMapper;
 
   @PostMapping("/create-customer")
   public ResponseEntity<CustomerResponse> createCustomer(
@@ -24,7 +25,7 @@ public class CustomerController {
     log.info("Create Customer Request: {}", createCustomerRequest);
 
     Customer customer = customerService.createCustomer(createCustomerRequest);
-    CustomerResponse customerResponse = CustomerMapper.INSTANCE.toCustomerDTO(customer);
+    CustomerResponse customerResponse = customerMapper.toCustomerDTO(customer);
     return ResponseEntity.ok(customerResponse);
   }
 
@@ -34,9 +35,9 @@ public class CustomerController {
         customerService
             .findByEmail(email)
             .orElseThrow(() -> new NoFoundException("Customer not found with email: " + email));
-    CustomerResponse customerResponse = CustomerMapper.INSTANCE.toCustomerDTO(customer);
+    CustomerResponse customerResponse = customerMapper.toCustomerDTO(customer);
 
     log.info("Get Customer By Email: {}", customerResponse.getAddress());
-    return ResponseEntity.ok(CustomerMapper.INSTANCE.toCustomerDTO(customer));
+    return ResponseEntity.ok(customerMapper.toCustomerDTO(customer));
   }
 }

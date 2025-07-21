@@ -8,6 +8,7 @@ import com.kane.customer.model.Customer;
 import com.kane.customer.repository.AddressRepo;
 import com.kane.customer.repository.CustomerRepo;
 import com.kane.customer.service.CustomerService;
+import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,16 +22,23 @@ import org.springframework.transaction.annotation.Transactional;
 public class CustomerServiceImp implements CustomerService {
   private final CustomerRepo customerRepo;
   private final AddressRepo addressRepo;
+  private final CustomerMapper customerMapper;
+
+  private static final Map<String, String> CONSTRAINT_MESSAGES =
+      Map.of(
+          "address_zip_code_key", "Zip code already exists.",
+          "customer_email_key", "Email already exists.",
+          "email_equals_backup_email", "Email must not be the same as backup email.");
 
   @Transactional
   @Override
   public Customer createCustomer(final CreateCustomerRequest createCustomerRequest) {
     try {
       log.info("createCustomerRequest: " + createCustomerRequest);
-      Address address = CustomerMapper.INSTANCE.toAddress(createCustomerRequest.getAddress());
+      Address address = customerMapper.toAddress(createCustomerRequest.getAddress());
       addressRepo.save(address);
 
-      Customer customer = CustomerMapper.INSTANCE.toCustomer(createCustomerRequest);
+      Customer customer = customerMapper.toCustomer(createCustomerRequest);
       customer.setAddress(address);
       customer.setActive(false);
       customerRepo.save(customer);
@@ -43,15 +51,14 @@ public class CustomerServiceImp implements CustomerService {
       log.error("PostgreSQL Error: " + rootMsg);
       System.out.println(">>> PostgreSQL Error: " + rootMsg);
 
-      if (rootMsg.contains("address_zip_code_key")) {
-        throw new DatabaseConstraintViolationException("Zip Code đã tồn tại");
-      } else if (rootMsg.contains("customer_email_key")) {
-        throw new DatabaseConstraintViolationException("Email đã tồn tại");
-      } else if (rootMsg.contains("email_equals_backup_email")) {
-        throw new DatabaseConstraintViolationException("Email và Backup Email phải giống nhau");
-      } else {
-        throw new DatabaseConstraintViolationException("Lỗi ràng buộc dữ liệu: " + rootMsg);
-      }
+      String message =
+          CONSTRAINT_MESSAGES.entrySet().stream()
+              .filter(entry -> rootMsg != null && rootMsg.contains(entry.getKey()))
+              .map(Map.Entry::getValue)
+              .findFirst()
+              .orElse("Data constraint violation: " + rootMsg);
+
+      throw new DatabaseConstraintViolationException(message);
     }
   }
 
