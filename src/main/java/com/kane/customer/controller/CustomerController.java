@@ -6,6 +6,7 @@ import com.kane.customer.dto.response.CustomerResponse;
 import com.kane.customer.mapper.CustomerMapper;
 import com.kane.customer.model.Customer;
 import com.kane.customer.service.CustomerService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ public class CustomerController {
 
   @PostMapping("/create-customer")
   public ResponseEntity<CustomerResponse> createCustomer(
-      @RequestBody CreateCustomerRequest createCustomerRequest) {
+      @Valid @RequestBody CreateCustomerRequest createCustomerRequest) {
     log.info("Create Customer Request: {}", createCustomerRequest);
 
     Customer customer = customerService.createCustomer(createCustomerRequest);

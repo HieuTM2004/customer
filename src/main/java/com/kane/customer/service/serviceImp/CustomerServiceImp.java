@@ -1,6 +1,5 @@
 package com.kane.customer.service.serviceImp;
 
-import com.kane.common.exception.DatabaseConstraintViolationException;
 import com.kane.customer.dto.request.CreateCustomerRequest;
 import com.kane.customer.mapper.CustomerMapper;
 import com.kane.customer.model.Address;
@@ -12,7 +11,6 @@ import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,33 +31,47 @@ public class CustomerServiceImp implements CustomerService {
   @Transactional
   @Override
   public Customer createCustomer(final CreateCustomerRequest createCustomerRequest) {
-    try {
-      log.info("createCustomerRequest: " + createCustomerRequest);
-      Address address = customerMapper.toAddress(createCustomerRequest.getAddress());
-      addressRepo.save(address);
+    //    try {
+    //
+    //      if (customerRepo.existsByEmail(createCustomerRequest.getEmail())) {
+    //        throw new BadRequestException("Email already exists");
+    //      }
+    //
+    //      if (addressRepo.existsByZipCode(createCustomerRequest.getAddress().getZipCode())) {
+    //        throw new BadRequestException("Zip code already exists");
+    //      }
+    //
+    //      if (createCustomerRequest
+    //          .getEmail()
+    //          .equalsIgnoreCase(createCustomerRequest.getBackupEmail())) {
+    //        throw new BadRequestException("Email must not be the same as backup email");
+    //      }
+    log.info("createCustomerRequest: " + createCustomerRequest);
+    Address address = customerMapper.toAddress(createCustomerRequest.getAddress());
+    addressRepo.save(address);
 
-      Customer customer = customerMapper.toCustomer(createCustomerRequest);
-      customer.setAddress(address);
-      customer.setActive(false);
-      customerRepo.save(customer);
+    Customer customer = customerMapper.toCustomer(createCustomerRequest);
+    customer.setAddress(address);
+    customer.setActive(false);
+    customerRepo.save(customer);
 
-      return customer;
+    return customer;
 
-    } catch (DataIntegrityViolationException e) {
-      String rootMsg = e.getRootCause() != null ? e.getRootCause().getMessage() : e.getMessage();
-
-      log.error("PostgreSQL Error: " + rootMsg);
-      System.out.println(">>> PostgreSQL Error: " + rootMsg);
-
-      String message =
-          CONSTRAINT_MESSAGES.entrySet().stream()
-              .filter(entry -> rootMsg != null && rootMsg.contains(entry.getKey()))
-              .map(Map.Entry::getValue)
-              .findFirst()
-              .orElse("Data constraint violation: " + rootMsg);
-
-      throw new DatabaseConstraintViolationException(message);
-    }
+    //    } catch (DataIntegrityViolationException e) {
+    //      String rootMsg = e.getRootCause() != null ? e.getRootCause().getMessage() :
+    // e.getMessage();
+    //
+    //      log.error("PostgreSQL Error: " + rootMsg);
+    //
+    //      String message =
+    //          CONSTRAINT_MESSAGES.entrySet().stream()
+    //              .filter(entry -> rootMsg != null && rootMsg.contains(entry.getKey()))
+    //              .map(Map.Entry::getValue)
+    //              .findFirst()
+    //              .orElse("Data constraint violation: " + rootMsg);
+    //
+    //      throw new DatabaseConstraintViolationException(message);
+    //    }
   }
 
   @Override
