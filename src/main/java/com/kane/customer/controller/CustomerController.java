@@ -7,6 +7,7 @@ import com.kane.customer.mapper.CustomerMapper;
 import com.kane.customer.model.Customer;
 import com.kane.customer.service.CustomerService;
 import jakarta.validation.Valid;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -40,5 +41,17 @@ public class CustomerController {
 
     log.info("Get Customer By Email: {}", customerResponse.getAddress());
     return ResponseEntity.ok(customerMapper.toCustomerDTO(customer));
+  }
+
+  @GetMapping("/get-customerUud/{email}")
+  public UUID getCustomerUudByEmail(@PathVariable String email) {
+    log.info("Customer-service with email: {}", email);
+    Customer customer =
+        customerService
+            .findByEmail(email)
+            .orElseThrow(() -> new NoFoundException("Customer not found with email: " + email));
+
+    log.info("Get Customer UUID By Email: {}", customer.getUuid());
+    return customer.getUuid();
   }
 }
