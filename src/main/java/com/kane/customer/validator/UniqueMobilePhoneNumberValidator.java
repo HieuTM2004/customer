@@ -16,7 +16,7 @@ public class UniqueMobilePhoneNumberValidator
 
   @Override
   public boolean isValid(String value, ConstraintValidatorContext context) {
-    if (value == null) return true; // Để @NotBlank xử lý null
+    if (value == null) return true;
     return !customerRepo.existsByMobilePhoneNumber(value);
   }
 }
