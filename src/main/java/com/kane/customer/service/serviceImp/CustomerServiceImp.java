@@ -1,15 +1,19 @@
 package com.kane.customer.service.serviceImp;
 
 import com.kane.customer.dto.request.CreateCustomerRequest;
+import com.kane.customer.dto.response.CustomerResponse;
 import com.kane.customer.mapper.CustomerMapper;
 import com.kane.customer.model.Address;
 import com.kane.customer.model.Customer;
 import com.kane.customer.repository.AddressRepo;
 import com.kane.customer.repository.CustomerRepo;
 import com.kane.customer.service.CustomerService;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +27,7 @@ public class CustomerServiceImp implements CustomerService {
 
   @Transactional
   @Override
+  @CacheEvict(value = "allCustomers", allEntries = true)
   public Customer createCustomer(final CreateCustomerRequest createCustomerRequest) {
     log.info("createCustomerRequest: {}", createCustomerRequest);
     Address address = customerMapper.toAddress(createCustomerRequest.getAddress());
@@ -39,5 +44,13 @@ public class CustomerServiceImp implements CustomerService {
   @Override
   public Optional<Customer> findByEmail(String username) {
     return customerRepo.findByEmail(username);
+  }
+
+  @Override
+  @Cacheable(value = "allCustomers")
+  public List<CustomerResponse> getAllCustomers() {
+    log.info("Fetching all customers");
+    List<Customer> customers = customerRepo.findAll();
+    return customers.stream().map(customerMapper::toCustomerDTO).toList();
   }
 }

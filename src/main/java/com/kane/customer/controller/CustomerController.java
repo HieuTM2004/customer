@@ -7,6 +7,7 @@ import com.kane.customer.mapper.CustomerMapper;
 import com.kane.customer.model.Customer;
 import com.kane.customer.service.CustomerService;
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,5 +54,13 @@ public class CustomerController {
 
     log.info("Get Customer UUID By Email: {}", customer.getUuid());
     return customer.getUuid();
+  }
+
+  @GetMapping("/getAll-customer")
+  public ResponseEntity<List<CustomerResponse>> getAllCustomer() {
+    log.info("Get All Customer Request");
+    List<CustomerResponse> customerResponses = customerService.getAllCustomers();
+
+    return ResponseEntity.ok(customerResponses);
   }
 }
