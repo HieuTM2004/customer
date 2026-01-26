@@ -20,7 +20,17 @@ spring:
       idle-timeout: 30000
       pool-name: HikariCP
 
+  cache:
+    type: redis
+    redis:
+      time-to-live: 300000
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
 jwt:
   duration: 900 # 15 minutes
   secret: 4An32HWrMUxVr0TH6ZrV6p+g/cT8KCwz34w7h7FdTc6h8mbIvAygs5DcfeiDtqFKm84/t4OeifghoVCBuymmtQ==
   refresh-duration: 604800 # 7 days
+
